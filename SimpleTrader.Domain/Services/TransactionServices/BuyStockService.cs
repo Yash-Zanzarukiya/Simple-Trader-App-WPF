@@ -18,7 +18,7 @@ namespace SimpleTrader.Domain.Services.TransactionServices
         {
             ArgumentNullException.ThrowIfNull(buyer);
             if (shares <= 0) throw new ArgumentException("Shares must be greater than 0", nameof(shares));
-            if (string.IsNullOrEmpty(symbol)) throw new ArgumentException("Symbol must be provided", nameof(symbol));
+            if (string.IsNullOrEmpty(symbol)) throw new InvalidSymbolException("Symbol must be provided" + nameof(symbol));
 
             double stockPrice = await _stockPriceService.GetPrice(symbol);
 
@@ -43,7 +43,6 @@ namespace SimpleTrader.Domain.Services.TransactionServices
                 Shares = shares,
                 DateProcessed = DateTime.Now
             });
-
 
             await _accountService.Update(buyer.Id, buyer);
             return buyer;

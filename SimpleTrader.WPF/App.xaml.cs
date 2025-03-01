@@ -7,6 +7,9 @@ using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFramework;
 using SimpleTrader.EntityFramework.Services;
 using SimpleTrader.FinanceAPI.Services;
+using SimpleTrader.WPF.State.Accounts;
+using SimpleTrader.WPF.State.Assets;
+using SimpleTrader.WPF.State.Authenticators;
 using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
 using SimpleTrader.WPF.ViewModels.Factories;
@@ -20,12 +23,6 @@ public partial class App : Application
     {
 
         IServiceProvider serviceProvider = CreateServiceProvider();
-
-        IAuthenticationService authenticationService = serviceProvider.GetRequiredService<IAuthenticationService>();
-
-        RegistrationResult registrationResult = await authenticationService.Register("niket@gmail.com", "niket", "12345678", "12345678");
-
-        Account account = await authenticationService.Login("niket", "12345678");
 
         Window window = serviceProvider.GetRequiredService<MainWindow>();
 
@@ -49,13 +46,44 @@ public partial class App : Application
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
-        services.AddSingleton<IRootViewModelFactory, RootViewModelFactory>();
-        services.AddSingleton<IViewModelFactory<HomeViewModel>, HomeViewModelFactory>();
-        services.AddSingleton<IViewModelFactory<PortfolioViewModel>, PortfolioViewModelFactory>();
-        services.AddSingleton<IViewModelFactory<MajorIndexViewModel>, MajorIndexViewModelFactory>();
+        services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+        services.AddSingleton<BuyViewModel>();
+        services.AddSingleton<PortfolioViewModel>();
+        services.AddSingleton<AssetSummaryViewModel>();
 
-        services.AddScoped<INavigator, Navigator>();
-        services.AddScoped<BuyViewModel>();
+        services.AddSingleton<CreateViewModel<HomeViewModel>>( services => 
+        {
+            return () => new HomeViewModel(
+                MajorIndexViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>()),
+                services.GetRequiredService<AssetSummaryViewModel>()
+            );
+        });
+
+        services.AddSingleton<ViewModelRenavigator<HomeViewModel>>();
+
+        services.AddSingleton<CreateViewModel<LoginViewModel>>(services =>
+        {
+            return () => new LoginViewModel(
+                services.GetRequiredService<IAuthenticator>(),
+                services.GetRequiredService<ViewModelRenavigator<HomeViewModel>>()
+            );
+        });
+
+        services.AddSingleton<CreateViewModel<BuyViewModel>>(services =>
+        {
+            return () => services.GetRequiredService<BuyViewModel>();
+        });
+
+        services.AddSingleton<CreateViewModel<PortfolioViewModel>>(services =>
+        {
+            return () => new PortfolioViewModel();
+        });
+
+        services.AddSingleton<INavigator, Navigator>();
+        services.AddSingleton<IAuthenticator, Authenticator>();
+        services.AddSingleton<IAccountStore, AccountStore>();
+        services.AddSingleton<AssetStore>();
+
         services.AddScoped<MainViewModel>();
         services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
 

@@ -17,7 +17,7 @@ namespace SimpleTrader.FinanceAPI.Services
             var stockPriceResult = apiRes?.FirstOrDefault();
 
             if (stockPriceResult == null || stockPriceResult.Price == 0)
-                throw new ApiException("Stock price not found for the symbol: " + symbol);
+                throw new InvalidSymbolException("Stock price not found for the symbol: " + symbol);
 
             return stockPriceResult.Price;
         }

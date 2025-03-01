@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\login-bg-img.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
   </ItemGroup>
 
@@ -16,6 +20,18 @@
     <ProjectReference Include="..\SimpleTrader.Domain\SimpleTrader.Domain.csproj" />
     <ProjectReference Include="..\SimpleTrader.EntityFramework\SimpleTrader.EntityFramework.csproj" />
     <ProjectReference Include="..\SimpleTrader.FinanceAPI\SimpleTrader.FinanceAPI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\login-bg-img.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Commands\AsyncCommandBase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>
